@@ -1,0 +1,10 @@
+# Executáveis e arquivos intermediários (a entrega perde 1 ponto se forem enviados)
+safedrive
+*.exe
+*.o
+*.out
+entrega.zip
+*:Zone.Identifier
+
+# Versão comentada (com nomes e matrículas) fica só na máquina local
+comentado/
