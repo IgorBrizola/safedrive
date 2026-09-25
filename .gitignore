@@ -5,6 +5,3 @@ safedrive
 *.out
 entrega.zip
 *:Zone.Identifier
-
-# Versão comentada (com nomes e matrículas) fica só na máquina local
-comentado/

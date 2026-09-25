@@ -12,7 +12,10 @@ make          # ou: gcc -Wall -Wextra -o safedrive safedrive.c
 make zip      # gera entrega.zip com a versão comentada
 ```
 
-Este repositório tem o código **sem comentários**. A versão comentada, com o cabeçalho de identificação do grupo, fica só na máquina local em `comentado/safedrive_comentado.c` (ignorada pelo git) e é ela que vai no zip do Moodle.
+Há duas versões do mesmo programa, com comportamento idêntico:
+
+- `safedrive.c`: código **sem comentários**.
+- `comentado/safedrive_comentado.c`: mesmo código **com comentários** e o cabeçalho de identificação do grupo. É ela que vai no zip do Moodle.
 
 ## Antes de entregar
 
