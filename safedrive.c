@@ -1,3 +1,8 @@
+/*
+ * Grupo 6
+ * IGOR RODRIGUES BRIZOLA - RA: 107304020
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
