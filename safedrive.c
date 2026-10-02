@@ -27,12 +27,12 @@ float mediana3(float a, float b, float c)
     return c;
 }
 
-float tempo_reacao(int sensibilidade)
+float tempo_reacao(int sensibilidade_adas)
 {
-    if (sensibilidade == 1) {
+    if (sensibilidade_adas == 1) {
         return 1.0;
     }
-    if (sensibilidade == 2) {
+    if (sensibilidade_adas == 2) {
         return 1.5;
     }
     return 2.0;
@@ -84,11 +84,11 @@ int inicializar_matrizes(float velocidades[][2], float sensores_frontais[][3],
 }
 
 void fundir_sensores(float sensores_frontais[][3], float processamento[][2],
-                     int n)
+                     int num_amostras)
 {
     int i;
 
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < num_amostras; i++) {
         processamento[i][0] = mediana3(sensores_frontais[i][0],
                                        sensores_frontais[i][1],
                                        sensores_frontais[i][2]);
@@ -96,27 +96,27 @@ void fundir_sensores(float sensores_frontais[][3], float processamento[][2],
 }
 
 void calcular_distancia_segura(float velocidades[][2], float processamento[][2],
-                               int n, float atrito, int sensibilidade)
+                               int num_amostras, float atrito_via, int sensibilidade_adas)
 {
     int i;
-    float v;
-    float tr = tempo_reacao(sensibilidade);
+    float velocidade_m_s;
+    float tr = tempo_reacao(sensibilidade_adas);
 
-    for (i = 0; i < n; i++) {
-        v = velocidades[i][0] / 3.6;
-        processamento[i][1] = (v * tr) + (v * v) / (2 * atrito * GRAVIDADE);
+    for (i = 0; i < num_amostras; i++) {
+        velocidade_m_s = velocidades[i][0] / 3.6;
+        processamento[i][1] = (velocidade_m_s * tr) + (velocidade_m_s * velocidade_m_s) / (2 * atrito_via * GRAVIDADE);
     }
 }
 
 void analisar_risco_frontal(float velocidades[][2], float processamento[][2],
-                            int status[][3], int n)
+                            int status[][3], int num_amostras)
 {
     int i;
     float velocidade_relativa;
     float validada;
     float segura;
 
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < num_amostras; i++) {
         velocidade_relativa = velocidades[i][0] - velocidades[i][1];
         validada = processamento[i][0];
         segura = processamento[i][1];
@@ -151,22 +151,22 @@ void analisar_faixas(float velocidades[][2], float sensores_laterais[][2],
 
 void exibir_relatorio(float velocidades[][2], float sensores_frontais[][3],
                       float sensores_laterais[][2], float processamento[][2],
-                      int status[][3], int n, float atrito, int sensibilidade)
+                      int status[][3], int num_amostras, float atrito_via, int sensibilidade_adas)
 {
     int i;
     int j;
     int geral;
 
     printf("\n==================== RELATÓRIO DE RISCOS ====================\n");
-    printf("Atrito da via: %.2f | Sensibilidade: %d | Tempo de reação: %.1f s\n",
-           atrito, sensibilidade, tempo_reacao(sensibilidade));
+    printf("atrito_via da via: %.2f | Sensibilidade: %d | Tempo de reação: %.1f s\n",
+           atrito_via, sensibilidade_adas, tempo_reacao(sensibilidade_adas));
 
-    if (n == 0) {
+    if (num_amostras == 0) {
         printf("\nNenhuma amostra registrada. Use a opção 1 ou 2 do menu.\n");
         return;
     }
 
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < num_amostras; i++) {
         printf("\n--------------------- Amostra %3d ---------------------\n", i + 1);
 
         printf("[Entrada]\n");
@@ -228,46 +228,46 @@ int main(void)
     float processamento[MAX_AMOSTRAS][2];
     int status[MAX_AMOSTRAS][3];
 
-    int n = 0;
+    int num_amostras = 0;
     int opcao = 0;
     int lidos;
-    int c;
-    float atrito = 0;
-    int sensibilidade = 0;
+    int character;
+    float atrito_via = 0;
+    int sensibilidade_adas = 0;
 
     srand(time(NULL));
 
     printf("=== SAFEDRIVE - Telemetria ADAS ===\n");
 
     do {
-        printf("Atrito da via (ex.: 0.7 asfalto seco, 0.4 molhado): ");
-        lidos = scanf("%f", &atrito);
+        printf("atrito da via (ex.: 0.7 asfalto seco, 0.4 molhado): ");
+        lidos = scanf("%f", &atrito_via);
         if (lidos == EOF) {
             return 0;
         }
         if (lidos != 1) {
-            while ((c = getchar()) != '\n' && c != EOF);
-            atrito = 0;
+            while ((character = getchar()) != '\n' && character != EOF);
+            atrito_via = 0;
         }
-        if (atrito <= 0) {
-            printf("Valor inválido. O atrito deve ser maior que zero.\n");
+        if (atrito_via <= 0) {
+            printf("Valor inválido. O atrito_via deve ser maior que zero.\n");
         }
-    } while (atrito <= 0);
+    } while (atrito_via <= 0);
 
     do {
         printf("Sensibilidade do ADAS (1-Esportivo, 2-Normal, 3-Seguro): ");
-        lidos = scanf("%d", &sensibilidade);
+        lidos = scanf("%d", &sensibilidade_adas);
         if (lidos == EOF) {
             return 0;
         }
         if (lidos != 1) {
-            while ((c = getchar()) != '\n' && c != EOF);
-            sensibilidade = 0;
+            while ((character = getchar()) != '\n' && character != EOF);
+            sensibilidade_adas = 0;
         }
-        if (sensibilidade < 1 || sensibilidade > 3) {
+        if (sensibilidade_adas < 1 || sensibilidade_adas > 3) {
             printf("Valor inválido. Escolha 1, 2 ou 3.\n");
         }
-    } while (sensibilidade < 1 || sensibilidade > 3);
+    } while (sensibilidade_adas < 1 || sensibilidade_adas > 3);
 
     do {
         printf("\n----------- MENU -----------\n");
@@ -275,57 +275,57 @@ int main(void)
         printf("2. Inserir nova amostra\n");
         printf("3. Processar e exibir relatório de riscos\n");
         printf("4. Sair\n");
-        printf("Amostras registradas: %d/%d\n", n, MAX_AMOSTRAS);
+        printf("Amostras registradas: %d/%d\n", num_amostras, MAX_AMOSTRAS);
         printf("Opção: ");
 
         lidos = scanf("%d", &opcao);
         if (lidos == EOF) {
             opcao = 4;
         } else if (lidos != 1) {
-            while ((c = getchar()) != '\n' && c != EOF);
+            while ((character = getchar()) != '\n' && character != EOF);
             opcao = 0;
         }
 
         if (opcao == 1) {
-            n = inicializar_matrizes(velocidades, sensores_frontais,
+            num_amostras = inicializar_matrizes(velocidades, sensores_frontais,
                                      sensores_laterais);
-            printf("%d amostras aleatórias carregadas.\n", n);
+            printf("%d amostras aleatórias carregadas.\n", num_amostras);
         } else if (opcao == 2) {
-            if (n >= MAX_AMOSTRAS) {
+            if (num_amostras >= MAX_AMOSTRAS) {
                 printf("Limite de %d amostras atingido.\n", MAX_AMOSTRAS);
             } else {
                 lidos = 0;
                 printf("Velocidade atual (km/h): ");
-                lidos = lidos + scanf("%f", &velocidades[n][0]);
+                lidos = lidos + scanf("%f", &velocidades[num_amostras][0]);
                 printf("Velocidade do veículo à frente (km/h): ");
-                lidos = lidos + scanf("%f", &velocidades[n][1]);
+                lidos = lidos + scanf("%f", &velocidades[num_amostras][1]);
                 printf("Radar (m): ");
-                lidos = lidos + scanf("%f", &sensores_frontais[n][0]);
+                lidos = lidos + scanf("%f", &sensores_frontais[num_amostras][0]);
                 printf("Lidar (m): ");
-                lidos = lidos + scanf("%f", &sensores_frontais[n][1]);
+                lidos = lidos + scanf("%f", &sensores_frontais[num_amostras][1]);
                 printf("Câmera (m): ");
-                lidos = lidos + scanf("%f", &sensores_frontais[n][2]);
+                lidos = lidos + scanf("%f", &sensores_frontais[num_amostras][2]);
                 printf("Distância da faixa esquerda (m): ");
-                lidos = lidos + scanf("%f", &sensores_laterais[n][0]);
+                lidos = lidos + scanf("%f", &sensores_laterais[num_amostras][0]);
                 printf("Distância da faixa direita (m): ");
-                lidos = lidos + scanf("%f", &sensores_laterais[n][1]);
+                lidos = lidos + scanf("%f", &sensores_laterais[num_amostras][1]);
 
                 if (lidos == 7) {
-                    n++;
-                    printf("Amostra %d registrada.\n", n);
+                    num_amostras++;
+                    printf("Amostra %d registrada.\n", num_amostras);
                 } else {
-                    while ((c = getchar()) != '\n' && c != EOF);
+                    while ((character = getchar()) != '\n' && character != EOF);
                     printf("Entrada inválida. Amostra descartada.\n");
                 }
             }
         } else if (opcao == 3) {
-            fundir_sensores(sensores_frontais, processamento, n);
-            calcular_distancia_segura(velocidades, processamento, n,
-                                      atrito, sensibilidade);
-            analisar_risco_frontal(velocidades, processamento, status, n);
-            analisar_faixas(velocidades, sensores_laterais, status, n);
+            fundir_sensores(sensores_frontais, processamento, num_amostras);
+            calcular_distancia_segura(velocidades, processamento, num_amostras,
+                                      atrito_via, sensibilidade_adas);
+            analisar_risco_frontal(velocidades, processamento, status, num_amostras);
+            analisar_faixas(velocidades, sensores_laterais, status, num_amostras);
             exibir_relatorio(velocidades, sensores_frontais, sensores_laterais,
-                             processamento, status, n, atrito, sensibilidade);
+                             processamento, status, num_amostras, atrito_via, sensibilidade_adas);
         } else if (opcao == 4) {
             printf("Encerrando o simulador.\n");
         } else {
