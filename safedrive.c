@@ -16,15 +16,15 @@ float aleatorio(float minimo, float maximo)
     return minimo + (rand() / (float) RAND_MAX) * (maximo - minimo);
 }
 
-float mediana3(float a, float b, float c)
+float mediana3(float radar, float lidar, float camera)
 {
-    if ((a >= b && a <= c) || (a <= b && a >= c)) {
-        return a;
+    if ((radar >= lidar && radar <= camera) || (radar <= lidar && radar >= camera)) {
+        return radar;
     }
-    if ((b >= a && b <= c) || (b <= a && b >= c)) {
-        return b;
+    if ((lidar >= radar && lidar <= camera) || (lidar <= radar && lidar >= camera)) {
+        return lidar;
     }
-    return c;
+    return camera;
 }
 
 float tempo_reacao(int sensibilidade_adas)
